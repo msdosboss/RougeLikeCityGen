@@ -6,10 +6,10 @@ all: main
 main: objects/main.o objects/generator.o
 	$(GXX) -o main objects/main.o objects/generator.o $(RAYLIB_FLAGS)
 
-objects/main.o: src/main.c
+objects/main.o: src/main.c src/main.h
 	$(GXX) -c -o objects/main.o src/main.c $(RAYLIB_FLAGS)
 
-objects/generator.o: src/generator.c
+objects/generator.o: src/generator.c src/generator.h
 	$(GXX) -c -o objects/generator.o src/generator.c $(RAYLIB_FLAGS)
 
 

@@ -2,6 +2,7 @@
 #define GENERATOR_H
 #include <raylib.h>
 #define FNL_IMPL
+#include "../lib/FastNoiseLite.h"
 
 #define WIDTH 800
 #define HEIGHT 800
@@ -13,7 +14,7 @@
 #define CELLCOLORBLUE 1
 
 typedef struct {
-    int type;
+    float type;
 } Cell;
 
 typedef struct {
