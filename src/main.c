@@ -3,15 +3,62 @@
 int main(){
     InitWindow(WIDTH, HEIGHT, "City Map");
     MapData mapData;
-    generateMap(&mapData);
+    float scale = 0.08;
+    float seaLevel = 0.4;
+    Vector2 landOrigin = {
+        .x = 0,
+        .y = 0
+    };
+    int toggleMode = TOGGLE_SCALE;
+    generateMap(&mapData, &scale, &seaLevel, landOrigin);
     while(!WindowShouldClose()){
+        if(IsKeyPressed(KEY_Z)){
+            toggleMode = TOGGLE_SCALE;
+        }
+        else if(IsKeyPressed(KEY_X)){
+            toggleMode = TOGGLE_SEA_LEVEL;
+        }
+        else if(IsKeyPressed(KEY_UP)){
+            switch(toggleMode){
+                case TOGGLE_SCALE:
+                    scale += 0.01;
+                    break;
+                case TOGGLE_SEA_LEVEL:
+                    if(seaLevel < 1.0){
+                        seaLevel += 0.05;
+                    }
+                    break;
+            }
+            generateMap(&mapData, &scale, &seaLevel, landOrigin);
+        }
+        else if(IsKeyPressed(KEY_DOWN)){
+            switch(toggleMode){
+                case TOGGLE_SCALE:
+                    if(scale > 0.0){
+                        scale -= 0.01;
+                    }
+                    break;
+                case TOGGLE_SEA_LEVEL:
+                    if(seaLevel > -1.0){
+                        seaLevel -= 0.05;
+                    }
+                    break;
+            }
+            generateMap(&mapData, &scale, &seaLevel, landOrigin);
+        }
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
         renderMapData(&mapData);
 
+        //UI Overlay
+        DrawText(TextFormat("Mode: %s", toggleMode == TOGGLE_SCALE ? "SCALE" : "SEA LEVEL"), 10, 10, 20, WHITE);
+        DrawText(TextFormat("Scale: %.3f", scale), 10, 40, 20, WHITE);
+        DrawText(TextFormat("Sea Level: %.2f", seaLevel), 10, 70, 20, WHITE);
+
         EndDrawing();
     }
+    CloseWindow();
     return 0;
 }
 

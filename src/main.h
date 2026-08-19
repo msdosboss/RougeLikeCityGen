@@ -3,6 +3,9 @@
 
 #include "generator.h"
 
+#define TOGGLE_SCALE 0
+#define TOGGLE_SEA_LEVEL 1
+
 void renderMapData(MapData *mapData);
 
 #endif
