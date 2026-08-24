@@ -1,6 +1,7 @@
 #ifndef GENERATOR_H
 #define GENERATOR_H
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include <raylib.h>
 #include "../lib/FastNoiseLite.h"
@@ -23,5 +24,6 @@ typedef struct {
 } MapData;
 
 void generateMap(MapData *mapData, float *scale, float *seaLevel, Vector2 coastOrigin);
+Vector2 tensorField(Vector2 worldCoord, Vector2 center);
 
 #endif

@@ -25,3 +25,23 @@ void generateMap(MapData *mapData, float *scale, float *seaLevel, Vector2 landOr
         }
     }
 }
+
+
+Vector2 tensorField(Vector2 worldCoord, Vector2 center){
+    Vector2 dCoord = {
+        .x = worldCoord.x - center.x,
+        .y = worldCoord.y - center.y
+    };
+    //Rotate 90 degrees
+    float tmp = -dCoord.y;
+    dCoord.y = dCoord.x;
+    dCoord.x = tmp;
+    //Normilize vector
+    double vecMagnitude = sqrt(dCoord.x * dCoord.x + dCoord.y * dCoord.y);
+    if(vecMagnitude != 0.0){
+        dCoord.x = dCoord.x / vecMagnitude;
+        dCoord.y = dCoord.y / vecMagnitude;
+    }
+
+    return dCoord;
+}

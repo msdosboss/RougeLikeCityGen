@@ -50,6 +50,11 @@ int main(){
         ClearBackground(RAYWHITE);
 
         renderMapData(&mapData);
+        Vector2 center = {
+            .x = NUMSQUAREWIDTH / 2,
+            .y = NUMSQUAREHEIGHT / 2
+        };
+        renderTensorField(center);
 
         //UI Overlay
         DrawText(TextFormat("Mode: %s", toggleMode == TOGGLE_SCALE ? "SCALE" : "SEA LEVEL"), 10, 10, 20, WHITE);
@@ -81,6 +86,23 @@ void renderMapData(MapData *mapData){
                 .height = SQUARESIZE
             };
             DrawRectangleRec(rendRect, color);
+        }
+    }
+}
+
+void renderTensorField(Vector2 centerCoord){
+    for(int x = 0; x < NUMSQUAREWIDTH; x += 15){
+        for(int y = 0; y < NUMSQUAREHEIGHT; y += 15){
+            Vector2 coord = {
+                .x = x * SQUARESIZE,
+                .y = y * SQUARESIZE
+            };
+            Vector2 path = tensorField(coord, centerCoord);
+            path.x = path.x * 15.0;
+            path.y = path.y * 15.0;
+            path.x = path.x + coord.x;
+            path.y = path.y + coord.y;
+            DrawLineV(coord, path, RED);
         }
     }
 }
