@@ -10,7 +10,16 @@ int main(){
         .y = 0
     };
     int toggleMode = TOGGLE_SCALE;
+    Vector2 center = {
+        .x = NUMSQUAREWIDTH / 2,
+        .y = NUMSQUAREHEIGHT / 2
+    };
+    Vector2 roadOrigin = {
+        .x = NUMSQUAREWIDTH / 10,
+        .y = NUMSQUAREHEIGHT / 1.5
+    };
     generateMap(&mapData, &scale, &seaLevel, landOrigin);
+    RoadGraph roadGraph = traceRoads(roadOrigin, center);
     while(!WindowShouldClose()){
         if(IsKeyPressed(KEY_Z)){
             toggleMode = TOGGLE_SCALE;
@@ -50,11 +59,8 @@ int main(){
         ClearBackground(RAYWHITE);
 
         renderMapData(&mapData);
-        Vector2 center = {
-            .x = NUMSQUAREWIDTH / 2,
-            .y = NUMSQUAREHEIGHT / 2
-        };
-        renderTensorField(center);
+        //renderTensorField(center);
+        renderRoadGraph(&roadGraph);
 
         //UI Overlay
         DrawText(TextFormat("Mode: %s", toggleMode == TOGGLE_SCALE ? "SCALE" : "SEA LEVEL"), 10, 10, 20, WHITE);
@@ -104,5 +110,19 @@ void renderTensorField(Vector2 centerCoord){
             path.y = path.y + coord.y;
             DrawLineV(coord, path, RED);
         }
+    }
+}
+
+void renderRoadGraph(RoadGraph *roadGraph){
+    for(int i = 0; i < roadGraph->edgeCount; i++){
+        Vector2 startPos = {
+            .x = roadGraph->vertices[roadGraph->edges[i].srcIndex].x,
+            .y = roadGraph->vertices[roadGraph->edges[i].srcIndex].y,
+        };
+        Vector2 endPos = {
+            .x = roadGraph->vertices[roadGraph->edges[i].destIndex].x,
+            .y = roadGraph->vertices[roadGraph->edges[i].destIndex].y,
+        };
+        DrawLineEx(startPos, endPos, 5.0, BLACK);
     }
 }

@@ -8,5 +8,6 @@
 
 void renderMapData(MapData *mapData);
 void renderTensorField(Vector2 centerCoord);
+void renderRoadGraph(RoadGraph *roadGraph);
 
 #endif

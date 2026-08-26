@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <raylib.h>
+#include "roadGraph.h"
 #include "../lib/FastNoiseLite.h"
 
 #define WIDTH 800
@@ -25,5 +26,6 @@ typedef struct {
 
 void generateMap(MapData *mapData, float *scale, float *seaLevel, Vector2 coastOrigin);
 Vector2 tensorField(Vector2 worldCoord, Vector2 center);
+RoadGraph traceRoads(Vector2 startCoord, Vector2 center);
 
 #endif
