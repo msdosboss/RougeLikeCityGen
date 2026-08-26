@@ -47,18 +47,17 @@ Vector2 tensorField(Vector2 worldCoord, Vector2 center){
 }
 
 
-RoadGraph traceRoads(Vector2 startCoord, Vector2 center){
-    int prevRoadIndex = 0;
-    int currentRoadIndex = 1;
+void traceRoads(RoadGraph *roadGraph, Vector2 startCoord, Vector2 center){
+    int prevRoadIndex = roadGraph->verticesCount;
+    int currentRoadIndex = roadGraph->verticesCount + 1;
     const int stepSize = 10;
     const int maxStepCount = 400;
     int stepCount = 0;
-    RoadGraph roadGraph = {0};
     Vector2 currentCoord = {
         .x = startCoord.x,
         .y = startCoord.y
     };
-    addVertex(&roadGraph, currentCoord.x, currentCoord.y);
+    addVertex(roadGraph, currentCoord.x, currentCoord.y);
 
     while(stepCount < maxStepCount){
         Vector2 roadVec = tensorField(currentCoord, center);
@@ -67,12 +66,10 @@ RoadGraph traceRoads(Vector2 startCoord, Vector2 center){
         if(currentCoord.y < 0 || currentCoord.y >= HEIGHT || currentCoord.x < 0 || currentCoord.x >= WIDTH){
             break;
         }
-        addVertex(&roadGraph, currentCoord.x, currentCoord.y);
-        addEdge(&roadGraph, prevRoadIndex, currentRoadIndex);
+        addVertex(roadGraph, currentCoord.x, currentCoord.y);
+        addEdge(roadGraph, prevRoadIndex, currentRoadIndex);
         prevRoadIndex = currentRoadIndex;
         currentRoadIndex++;
         stepCount++; 
     }
-
-    return roadGraph;
 }
