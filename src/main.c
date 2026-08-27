@@ -20,10 +20,10 @@ int main(){
     };
     generateMap(&mapData, &scale, &seaLevel, landOrigin);
     RoadGraph roadGraph = {0};
-    traceRoads(&roadGraph, roadOrigin, center);
+    traceRoads(&roadGraph, &mapData, roadOrigin, center);
     roadOrigin.x = roadGraph.vertices[roadGraph.verticesCount - 1].x;
     roadOrigin.y = roadGraph.vertices[roadGraph.verticesCount - 1].y;
-    traceRoads(&roadGraph, roadOrigin, center);
+    traceRoads(&roadGraph, &mapData, roadOrigin, center);
     while(!WindowShouldClose()){
         if(IsKeyPressed(KEY_Z)){
             toggleMode = TOGGLE_SCALE;

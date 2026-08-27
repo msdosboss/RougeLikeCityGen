@@ -47,7 +47,19 @@ Vector2 tensorField(Vector2 worldCoord, Vector2 center){
 }
 
 
-void traceRoads(RoadGraph *roadGraph, Vector2 startCoord, Vector2 center){
+int coordIsInWater(MapData *mapData, Vector2 coord){
+    int xGridCoord = (int)floor(coord.x / SQUARESIZE);
+    int yGridCoord = (int)floor(coord.y / SQUARESIZE);
+    if(mapData->grid[xGridCoord][yGridCoord].type == CELLCOLORBLUE){
+        return 1;
+    }
+    else{
+        return 0;
+    }
+}
+
+
+void traceRoads(RoadGraph *roadGraph, MapData *mapData, Vector2 startCoord, Vector2 center){
     int prevRoadIndex = roadGraph->verticesCount;
     int currentRoadIndex = roadGraph->verticesCount + 1;
     const int stepSize = 10;
@@ -63,6 +75,9 @@ void traceRoads(RoadGraph *roadGraph, Vector2 startCoord, Vector2 center){
         Vector2 roadVec = tensorField(currentCoord, center);
         currentCoord.x += roadVec.x * stepSize;
         currentCoord.y += roadVec.y * stepSize;
+        if(coordIsInWater(mapData, currentCoord)){
+            break;
+        }
         if(currentCoord.y < 0 || currentCoord.y >= HEIGHT || currentCoord.x < 0 || currentCoord.x >= WIDTH){
             break;
         }
