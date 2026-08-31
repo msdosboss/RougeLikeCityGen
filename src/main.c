@@ -16,7 +16,7 @@ int main(){
     };
     Vector2 roadOrigin = {
         .x = NUMSQUAREWIDTH / 10,
-        .y = NUMSQUAREHEIGHT / 1.5
+        .y = NUMSQUAREHEIGHT / 8
     };
     generateMap(&mapData, &scale, &seaLevel, landOrigin);
     RoadGraph roadGraph = {0};

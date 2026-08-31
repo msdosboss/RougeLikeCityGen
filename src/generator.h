@@ -24,6 +24,11 @@ typedef struct {
     Cell grid[NUMSQUAREWIDTH][NUMSQUAREHEIGHT];
 } MapData;
 
+typedef struct {
+    float slope;
+    float yIntercept;
+} VectorEquation;
+
 void generateMap(MapData *mapData, float *scale, float *seaLevel, Vector2 coastOrigin);
 Vector2 tensorField(Vector2 worldCoord, Vector2 center);
 void traceRoads(RoadGraph *roadGraph, MapData *mapData, Vector2 startCoord, Vector2 center);

@@ -59,6 +59,14 @@ int coordIsInWater(MapData *mapData, Vector2 coord){
 }
 
 
+VectorEquation findVectorEquation(Vector2 startCoord, Vector2 endCoord){
+    VectorEquation vectorEquation = {0};
+    vectorEquation.slope = (endCoord.y - startCoord.y) / (endCoord.x - startCoord.x);
+    vectorEquation.yIntercept = startCoord.y - vectorEquation.slope * startCoord.x;
+    return vectorEquation;
+}
+
+
 void traceRoads(RoadGraph *roadGraph, MapData *mapData, Vector2 startCoord, Vector2 center){
     int prevRoadIndex = roadGraph->verticesCount;
     int currentRoadIndex = roadGraph->verticesCount + 1;
