@@ -1,6 +1,7 @@
 #define FNL_IMPL
 #include "generator.h"
 
+
 void generateMap(MapData *mapData, float *scale, float *seaLevel, Vector2 landOrigin){
     fnl_state noise = fnlCreateState();
     noise.noise_type = FNL_NOISE_OPENSIMPLEX2;
@@ -64,6 +65,40 @@ VectorEquation findVectorEquation(Vector2 startCoord, Vector2 endCoord){
     vectorEquation.slope = (endCoord.y - startCoord.y) / (endCoord.x - startCoord.x);
     vectorEquation.yIntercept = startCoord.y - vectorEquation.slope * startCoord.x;
     return vectorEquation;
+}
+
+
+int isIntersect(RoadGraph *roadGraph, Edge canidateEdge, Edge oldEdge, Vector2 *intersectionPoint){
+    Vertex v1 = roadGraph->vertices[canidateEdge.srcIndex];
+    Vertex v2 = roadGraph->vertices[canidateEdge.destIndex];
+    Vertex v3 = roadGraph->vertices[oldEdge.srcIndex];
+    Vertex v4 = roadGraph->vertices[oldEdge.destIndex];
+    //D = (x1 - x2)(y3 - y4) - (y1 - y2)(x3 - x4)
+    float denominator = (v1.x - v2.x) * (v3.y - v4.y) - (v1.y - v2.y) * (v3.x = v4.x);
+    if(denominator == 0){
+        return 0;
+    }
+    //X(t) = x1 + t(x2 - x1)
+    //Y(t) = y1 + t(y2 - y1)
+    //X(u) = x3 + u(x4 - x3)
+    //Y(u) = y3 + u(y4 - y3)
+    //Where X(t) and Y(t) represent the x and y coords t percent through the vector
+    //This allows us to set X(t) = X(u) and Y(t) = Y(u) because they will be equal when they intersect
+    //We then us systems of equations to solve for t and u. if t and u are inclusivly between 0 and 1
+    //we know intersect in the existing line
+    float t = ((v1.x - v3.x) * (v3.y - v4.y) - (v1.y - v3.y) * (v3.x - v4.x)) / denominator;
+    float u = ((v1.x - v3.x) * (v1.y - v2.y) - (v1.y - v3.y) * (v1.x - v2.x)) / denominator;
+    if(u < 0.0 || u > 1.0){
+        return 0;
+    }
+    else if(u < 0.0 || u > 1.0){
+        return 0;
+    }
+
+    intersectionPoint->x = v1.x + t * (v2.x - v1.x);
+    intersectionPoint->y = v1.y + t * (v2.y - v2.x);
+
+    return 1;
 }
 
 

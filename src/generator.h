@@ -32,5 +32,7 @@ typedef struct {
 void generateMap(MapData *mapData, float *scale, float *seaLevel, Vector2 coastOrigin);
 Vector2 tensorField(Vector2 worldCoord, Vector2 center);
 void traceRoads(RoadGraph *roadGraph, MapData *mapData, Vector2 startCoord, Vector2 center);
+int coordIsInWater(MapData *mapData, Vector2 coord);
+int isIntersect(RoadGraph *roadGraph, Edge canidateEdge, Edge oldEdge, Vector2 *intersectionPoint);
 
 #endif
