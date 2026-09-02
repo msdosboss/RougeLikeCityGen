@@ -3,8 +3,8 @@
 
 #include <stdio.h>
 
-#define MAX_EDGES 2048
-#define MAX_VERTICES 2048
+#define MAX_EDGES 64000
+#define MAX_VERTICES 64000
 
 typedef struct {
     float x;

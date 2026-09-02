@@ -6,24 +6,12 @@ int main(){
     float scale = 0.08;
     float seaLevel = 0.4;
     Vector2 landOrigin = {
-        .x = 0,
-        .y = 0
+        .x = NUMSQUAREWIDTH / 2,
+        .y = NUMSQUAREHEIGHT / 4
     };
     int toggleMode = TOGGLE_SCALE;
-    Vector2 center = {
-        .x = NUMSQUAREWIDTH / 2,
-        .y = NUMSQUAREHEIGHT / 2
-    };
-    Vector2 roadOrigin = {
-        .x = NUMSQUAREWIDTH / 10,
-        .y = NUMSQUAREHEIGHT / 8
-    };
     generateMap(&mapData, &scale, &seaLevel, landOrigin);
-    RoadGraph roadGraph = {0};
-    traceRoads(&roadGraph, &mapData, roadOrigin, center);
-    roadOrigin.x = roadGraph.vertices[roadGraph.verticesCount - 1].x;
-    roadOrigin.y = roadGraph.vertices[roadGraph.verticesCount - 1].y;
-    traceRoads(&roadGraph, &mapData, roadOrigin, center);
+    RoadGraph roadGraph = urbanPlanner(&mapData, landOrigin);
     while(!WindowShouldClose()){
         if(IsKeyPressed(KEY_Z)){
             toggleMode = TOGGLE_SCALE;
@@ -43,6 +31,7 @@ int main(){
                     break;
             }
             generateMap(&mapData, &scale, &seaLevel, landOrigin);
+            roadGraph = urbanPlanner(&mapData, landOrigin);
         }
         else if(IsKeyPressed(KEY_DOWN)){
             switch(toggleMode){
@@ -58,6 +47,7 @@ int main(){
                     break;
             }
             generateMap(&mapData, &scale, &seaLevel, landOrigin);
+            roadGraph = urbanPlanner(&mapData, landOrigin);
         }
         BeginDrawing();
         ClearBackground(RAYWHITE);
@@ -101,13 +91,20 @@ void renderMapData(MapData *mapData){
 }
 
 void renderTensorField(Vector2 centerCoord){
+    fnl_state noise = fnlCreateState();
+    noise.noise_type = FNL_NOISE_OPENSIMPLEX2;
     for(int x = 0; x < NUMSQUAREWIDTH; x += 15){
         for(int y = 0; y < NUMSQUAREHEIGHT; y += 15){
             Vector2 coord = {
                 .x = x * SQUARESIZE,
                 .y = y * SQUARESIZE
             };
-            Vector2 path = tensorField(coord, centerCoord);
+            TensorWeights tensorWeights = {
+                .radial = 0.5,
+                .grid = 0.5,
+                .noise = 0.0
+            };
+            Vector2 path = tensorField(coord, centerCoord, &tensorWeights, &noise);
             path.x = path.x * 15.0;
             path.y = path.y * 15.0;
             path.x = path.x + coord.x;
@@ -127,6 +124,6 @@ void renderRoadGraph(RoadGraph *roadGraph){
             .x = roadGraph->vertices[roadGraph->edges[i].destIndex].x,
             .y = roadGraph->vertices[roadGraph->edges[i].destIndex].y,
         };
-        DrawLineEx(startPos, endPos, 5.0, BLACK);
+        DrawLineEx(startPos, endPos, 2.0, BLACK);
     }
 }

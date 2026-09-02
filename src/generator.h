@@ -29,10 +29,30 @@ typedef struct {
     float yIntercept;
 } VectorEquation;
 
+typedef struct {
+    float radial;
+    float grid;
+    float noise;
+} TensorWeights;
+
 void generateMap(MapData *mapData, float *scale, float *seaLevel, Vector2 coastOrigin);
-Vector2 tensorField(Vector2 worldCoord, Vector2 center);
-void traceRoads(RoadGraph *roadGraph, MapData *mapData, Vector2 startCoord, Vector2 center);
+Vector2 tensorField(Vector2 worldCoord, Vector2 center, TensorWeights *tensorWeights, fnl_state *noise);
+void traceRoads(
+    RoadGraph *roadGraph,
+    MapData *mapData,
+    Vector2 startCoord,
+    Vector2 center,
+    TensorWeights *tensorWeights,
+    fnl_state *noise
+);
 int coordIsInWater(MapData *mapData, Vector2 coord);
-int isIntersect(RoadGraph *roadGraph, Edge canidateEdge, Edge oldEdge, Vector2 *intersectionPoint);
+int isIntersect(
+    RoadGraph *roadGraph, 
+    Vector2 canidateStart, 
+    Vector2 canidateEnd, 
+    Edge oldEdge, 
+    Vector2 *intersectionPoint
+);
+RoadGraph urbanPlanner(MapData *mapData, Vector2 center);
 
 #endif
