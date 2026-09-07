@@ -181,6 +181,9 @@ RoadGraph urbanPlanner(MapData *mapData, Vector2 center){
         };
         traceRoads(&roadGraph, mapData, roadOrigin, center, &tensorWeights, &noise);
     }
+
+    removeDeadEnds(&roadGraph);
+
     return roadGraph;
 }
 

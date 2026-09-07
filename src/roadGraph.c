@@ -20,23 +20,35 @@ void addVertex(RoadGraph *roadGraph, float x, float y){
     roadGraph->verticesCount++;
 }
 
-int deadEnd(RoadGraph *roadGraph){
-    int vertexDegree[MAX_VERTICES] = {0};
-    for(int i = 0; i < roadGraph->edgeCount; i++){
-        vertexDegree[roadGraph->edges[i].srcIndex]++;
-        vertexDegree[roadGraph->edges[i].destIndex]++;
-    }
-    int isDeadEnd = 0;
-    for(int i = 0; i < roadGraph->edgeCount; i++){
-        if(vertexDegree[i] <= 1){
-            roadGraph->edgeCount--;
-            roadGraph->edges[i] = roadGraph->edges[roadGraph->edgeCount];
-            isDeadEnd = 1;
-        }
-    }
-    return isDeadEnd;
-}
-
 void removeDeadEnds(RoadGraph *roadGraph){
-    while(deadEnd(roadGraph));
+    int verticesDegree[MAX_VERTICES] = {0};
+
+    for(int i = 0; i < roadGraph->edgeCount; i++){
+        verticesDegree[roadGraph->edges[i].destIndex]++;
+        verticesDegree[roadGraph->edges[i].srcIndex]++;
+    }
+
+    int passMadeChanges;
+    do{
+        passMadeChanges = 0;
+
+        for(int i = 0; i < roadGraph->edgeCount;){
+            int u = roadGraph->edges[i].srcIndex;
+            int v = roadGraph->edges[i].destIndex;
+
+            if(verticesDegree[u] <= 1 || verticesDegree[v] <= 1){
+                verticesDegree[u]--;
+                verticesDegree[v]--; 
+
+                roadGraph->edgeCount--;
+                roadGraph->edges[i] = roadGraph->edges[roadGraph->edgeCount];
+                passMadeChanges = 1;
+            }
+            else{
+                i++;
+            }
+        }
+    
+    }
+    while(passMadeChanges);
 }
