@@ -25,5 +25,7 @@ typedef struct {
 
 void addVertex(RoadGraph *roadGraph, float x, float y);
 void addEdge(RoadGraph *roadGraph, int srcIndex, int destIndex);
+int deadEnd(RoadGraph *roadGraph);
+void removeDeadEnds(RoadGraph *roadGraph);
 
 #endif
