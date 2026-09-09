@@ -14,8 +14,10 @@ int main(){
     generateMap(&mapData, &scale, &seaLevel, landOrigin);
     const int districtCount = 7;
     Vector2 districts[districtCount];
+    Vector2 center = getRandomLandCoord(&mapData);
+    districts[0] = center;
     createDistrictsCoords(&mapData, districts, districtCount);
-    RoadGraph roadGraph = urbanPlanner(&mapData, landOrigin, districts, districtCount);
+    RoadGraph roadGraph = urbanPlanner(&mapData, center, districts, districtCount);
     while(!WindowShouldClose()){
         if(IsKeyPressed(KEY_Z)){
             toggleMode = TOGGLE_SCALE;
@@ -34,9 +36,11 @@ int main(){
                     }
                     break;
             }
+            center = getRandomLandCoord(&mapData);
+            districts[0] = center;
             generateMap(&mapData, &scale, &seaLevel, landOrigin);
             createDistrictsCoords(&mapData, districts, districtCount);
-            roadGraph = urbanPlanner(&mapData, landOrigin, districts, districtCount);
+            roadGraph = urbanPlanner(&mapData, center, districts, districtCount);
         }
         else if(IsKeyPressed(KEY_DOWN)){
             switch(toggleMode){
@@ -51,9 +55,11 @@ int main(){
                     }
                     break;
             }
+            center = getRandomLandCoord(&mapData);
+            districts[0] = center;
             generateMap(&mapData, &scale, &seaLevel, landOrigin);
             createDistrictsCoords(&mapData, districts, districtCount);
-            roadGraph = urbanPlanner(&mapData, landOrigin, districts, districtCount);
+            roadGraph = urbanPlanner(&mapData, center, districts, districtCount);
         }
         BeginDrawing();
         ClearBackground(RAYWHITE);

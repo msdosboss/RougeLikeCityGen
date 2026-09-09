@@ -164,12 +164,12 @@ float distBetweenTwoPoints(Vector2 a, Vector2 b){
 
 
 void createDistrictsCoords(MapData *mapData, Vector2 *districts, const int districtCount){
-    for(int i = 0; i < districtCount;){
+    for(int i = 1; i < districtCount;){
         districts[i] = getRandomLandCoord(mapData);
         int isToClose = 0;
         //Check over all the previous points to make sure they are not to close
         for(int j = i - 1; j >= 0; j--){
-            if(distBetweenTwoPoints(districts[i], districts[j]) < 50){
+            if(distBetweenTwoPoints(districts[i], districts[j]) < NUMSQUAREWIDTH/ 20){
                 isToClose = 1;
                 break;
             } 
