@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 #include <raylib.h>
 #include "roadGraph.h"
 #include "../lib/FastNoiseLite.h"
@@ -40,6 +41,7 @@ Vector2 tensorField(Vector2 worldCoord, Vector2 center, TensorWeights *tensorWei
 void traceRoads(
     RoadGraph *roadGraph,
     MapData *mapData,
+    int startVertex,
     Vector2 startCoord,
     Vector2 center,
     TensorWeights *tensorWeights,
@@ -53,6 +55,11 @@ int isIntersect(
     Edge oldEdge, 
     Vector2 *intersectionPoint
 );
-RoadGraph urbanPlanner(MapData *mapData, Vector2 center);
+int whichVertexIsCloser(Vertex origin, Vertex a, Vertex b);
+RoadGraph urbanPlanner(MapData *mapData, Vector2 center, Vector2 *districts, const int districtCount);
+Vector2 getRandomCoord();
+Vector2 getRandomLandCoord(MapData *mapData);
+float distBetweenTwoPoints(Vector2 a, Vector2 b);
+void createDistrictsCoords(MapData *mapData, Vector2 *districts, const int districtCount);
 
 #endif

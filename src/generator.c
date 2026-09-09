@@ -140,10 +140,52 @@ int isIntersect(
 }
 
 
-RoadGraph urbanPlanner(MapData *mapData, Vector2 center){
+Vector2 getRandomCoord(){
+    return (Vector2){
+        .x = GetRandomValue(0, NUMSQUAREWIDTH),
+        .y = GetRandomValue(0, NUMSQUAREHEIGHT)
+    };
+}
+
+
+Vector2 getRandomLandCoord(MapData *mapData){
+    Vector2 landCoord;
+    do{
+        landCoord = getRandomCoord();
+    }
+    while(coordIsInWater(mapData, landCoord));
+    return landCoord;
+}
+
+
+float distBetweenTwoPoints(Vector2 a, Vector2 b){
+    return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+}
+
+
+void createDistrictsCoords(MapData *mapData, Vector2 *districts, const int districtCount){
+    for(int i = 0; i < districtCount;){
+        districts[i] = getRandomLandCoord(mapData);
+        int isToClose = 0;
+        //Check over all the previous points to make sure they are not to close
+        for(int j = i - 1; j >= 0; j--){
+            if(distBetweenTwoPoints(districts[i], districts[j]) < 50){
+                isToClose = 1;
+                break;
+            } 
+        }
+        if(!isToClose){
+            i++;
+        }
+    } 
+}
+
+
+RoadGraph urbanPlanner(MapData *mapData, Vector2 center, Vector2 *districts, const int districtCount){
     RoadGraph roadGraph = {0};
     fnl_state noise = fnlCreateState();
     noise.noise_type = FNL_NOISE_OPENSIMPLEX2;
+    int currentVertexIndex = addVertex(&roadGraph, center.x, center.y);
     //Primary roads
     for(int x = -10; x <= 4; x += 10){
         for(int y = -10; y <= 4; y += 10){
@@ -156,11 +198,11 @@ RoadGraph urbanPlanner(MapData *mapData, Vector2 center){
                 .y = center.y + y
             }; 
             TensorWeights tensorWeights = {
-                .radial = 0.3,
-                .grid = 0.65,
+                .radial = 0.0,
+                .grid = 0.95,
                 .noise = 0.05
             };
-            traceRoads(&roadGraph, mapData, roadOrigin, center, &tensorWeights, &noise);
+            traceRoads(&roadGraph, mapData, currentVertexIndex, roadOrigin, center, &tensorWeights, &noise);
         }
     }
     //Branching from primary roads
@@ -179,7 +221,7 @@ RoadGraph urbanPlanner(MapData *mapData, Vector2 center){
             .grid = 0.8,
             .noise = 0.1
         };
-        traceRoads(&roadGraph, mapData, roadOrigin, center, &tensorWeights, &noise);
+        traceRoads(&roadGraph, mapData, i, roadOrigin, districts[i % districtCount], &tensorWeights, &noise);
     }
 
     removeDeadEnds(&roadGraph);
@@ -187,17 +229,34 @@ RoadGraph urbanPlanner(MapData *mapData, Vector2 center){
     return roadGraph;
 }
 
+//Returns 0 if a is closer and 1 if b is closer 
+int whichVertexIsCloser(Vertex origin, Vertex a, Vertex b){
+    float x = origin.x - a.x;
+    float y = origin.y - a.y;
+    float distFromA = sqrt(x * x + y * y);
+    x = origin.x - b.x;
+    y = origin.y - b.y;
+    float distFromB = sqrt(x * x + y * y);
+    if(distFromA > distFromB){
+        return 1;
+    }
+    else{
+        return 0;
+    }
+}
+
 
 void traceRoads(
     RoadGraph *roadGraph,
     MapData *mapData,
+    int startVertex,
     Vector2 startCoord,
     Vector2 center,
     TensorWeights *tensorWeights,
     fnl_state *noise
 ){
-    int prevRoadIndex = roadGraph->verticesCount;
-    int currentRoadIndex = roadGraph->verticesCount + 1;
+    int currentRoadIndex;
+    int prevRoadIndex = startVertex;
     const int stepSize = 10;
     const int maxStepCount = 400;
     int stepCount = 0;
@@ -205,8 +264,9 @@ void traceRoads(
         .x = startCoord.x,
         .y = startCoord.y
     };
-    addVertex(roadGraph, currentCoord.x, currentCoord.y);
+    //addVertex(roadGraph, currentCoord.x, currentCoord.y);
 
+    int lastEdgeDrawnbyThisTrace = -1;
     while(stepCount < maxStepCount){
         Vector2 roadVec = tensorField(currentCoord, center, tensorWeights, noise);
         Vector2 oldCoord = {
@@ -232,16 +292,26 @@ void traceRoads(
                 roadGraph->edges[i],
                 &intersectionPoint)
             ){
+                if(i == lastEdgeDrawnbyThisTrace){
+                    continue;
+                }
                 currentCoord = intersectionPoint;
+                currentRoadIndex = addVertex(roadGraph, currentCoord.x, currentCoord.y);
+                addEdge(roadGraph, currentRoadIndex, prevRoadIndex);
+                //Snapping to the closest vertex
+                int bIndex = roadGraph->edges[i].destIndex;
+                roadGraph->edges[i].destIndex = currentRoadIndex;
+                addEdge(roadGraph, currentRoadIndex, bIndex);
                 didIntersect = 1;
                 break;
             } 
         }
-        addVertex(roadGraph, currentCoord.x, currentCoord.y);
-        addEdge(roadGraph, prevRoadIndex, currentRoadIndex);
         if(didIntersect){
             break;
         }
+        currentRoadIndex = addVertex(roadGraph, currentCoord.x, currentCoord.y);
+        addEdge(roadGraph, prevRoadIndex, currentRoadIndex);
+        lastEdgeDrawnbyThisTrace = roadGraph->edgeCount - 1;
         prevRoadIndex = currentRoadIndex;
         currentRoadIndex++;
         stepCount++; 
